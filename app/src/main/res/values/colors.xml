@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="dark_blue">#005A8A</color>
+    <color name="color_ripple">#ffffff</color>
+    <color name="color_menu_action">#ffffff</color>
+
+    <color name="colorArrows">#8a000000</color>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_marginTop="@dimen/card_margin"
+        android:layout_marginStart="@dimen/card_margin"
+        android:layout_marginEnd="@dimen/card_margin"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:padding="@dimen/component_padding"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/item_country_image"
+                tools:src="@drawable/tmp_ua"
+                android:layout_width="@dimen/small_icon_size"
+                android:layout_height="@dimen/small_icon_size"/>
+
+        <TextView
+                android:id="@+id/item_country_title"
+                android:layout_marginStart="@dimen/component_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                tools:text="Title"/>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

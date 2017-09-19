@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/item_city_image"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginEnd="@dimen/component_margin"
+            android:layout_alignTop="@+id/item_city_name_tv"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/component_margin"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_city_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Name, AdminArea"
+            android:layout_toEndOf="@+id/item_city_image"
+            android:layout_toStartOf="@+id/item_city_temperature"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_marginTop="@dimen/component_margin"
+            android:layout_marginEnd="@dimen/component_margin"
+            android:layout_alignParentTop="true"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_city_population_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Population: "
+            android:layout_toStartOf="@+id/item_city_temperature"
+            android:layout_below="@+id/item_city_name_tv"
+            android:layout_toEndOf="@+id/item_city_image"
+            android:layout_marginBottom="@dimen/component_margin"
+            android:layout_marginEnd="@dimen/component_margin"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_city_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/component_margin"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            tools:text="+30"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+
+    <View
+            style="@style/AppTheme.HorizontalDivider"
+            android:layout_below="@id/item_city_population_tv"
+            android:layout_alignParentBottom="true"/>
+
+
+</RelativeLayout>

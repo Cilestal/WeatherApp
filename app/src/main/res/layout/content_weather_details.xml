@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <android.support.v7.widget.LinearLayoutCompat
+            android:visibility="gone"
+            android:id="@+id/content_weather_details_content_layout"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+                android:layout_marginTop="@dimen/card_margin"
+                android:layout_marginStart="@dimen/card_margin"
+                android:layout_marginEnd="@dimen/card_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <include layout="@layout/item_temperature"/>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+                android:layout_marginTop="@dimen/card_margin"
+                android:layout_marginStart="@dimen/card_margin"
+                android:layout_marginEnd="@dimen/card_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/content_weather_details_hourly_info_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+                android:layout_marginTop="@dimen/card_margin"
+                android:layout_marginStart="@dimen/card_margin"
+                android:layout_marginEnd="@dimen/card_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/content_weather_details_daily_info_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+        </android.support.v7.widget.CardView>
+
+    </android.support.v7.widget.LinearLayoutCompat>
+
+    <ProgressBar
+            android:id="@+id/content_weather_details_pb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+</FrameLayout>

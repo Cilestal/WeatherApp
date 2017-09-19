@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Accuwether-vrgcourses</string>
+    <string name="assets_flags_path">file:///android_asset/flags/%s.png</string>
+    <string name="assets_weather_icons_path">file:///android_asset/weather_icons/%02d.png</string>
+
+    <string name="dialog_country_list_title">Countries:</string>
+
+    <string name="city_name">%1$s,\n%2$s</string>
+    <string name="city_population">Population: %,d</string>
+    <string name="temperature">%.1f°C</string>
+    <string name="time">%tR</string>
+    <string name="humidity">%d \%</string>
+    <string name="wind">%.1f Km\\h</string>
+    <string name="day_of_week">%ta</string>
+    <string name="abbreviated_date">%1$tb %1$te</string>
+
+    <string name="error_add_to_favorite">Ошибка при попытке добавить в избранное</string>
+    <string name="button_choose_your_country">Choose your country or region</string>
+
+    <string name="error_auth">Auth error stub.</string>
+    <string name="error_connect">Connection error.</string>
+    <string name="error_load_weather">Ошибка при загрузке погоды...</string>
+
+    <string name="menu_action_add_favorite">Add to Favorites</string>
+    <string name="menu_action_remove_favorite">Remove from Favorites</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="action_retry">Retry</string>
+
+
+</resources>

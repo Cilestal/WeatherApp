@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/component_padding">
+
+    <android.support.v7.widget.AppCompatImageView
+            app:srcCompat="@drawable/icon_time"
+            android:layout_width="@dimen/text_drawable_icon_size"
+            android:layout_height="@dimen/text_drawable_icon_size"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_hourly_weather_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/image_drawable_padding"
+            android:paddingEnd="@dimen/image_drawable_padding"
+            tools:text="21:00"/>
+
+    <android.support.v7.widget.AppCompatImageView
+            app:srcCompat="@drawable/icon_temp"
+            android:layout_width="@dimen/text_drawable_icon_size"
+            android:layout_height="@dimen/text_drawable_icon_size"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_hourly_weather_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/image_drawable_padding"
+            android:paddingEnd="@dimen/image_drawable_padding"
+            tools:text="50°"/>
+
+    <android.support.v7.widget.AppCompatImageView
+            app:srcCompat="@drawable/icon_humidity"
+            android:layout_width="@dimen/text_drawable_icon_size"
+            android:layout_height="@dimen/text_drawable_icon_size"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_hourly_weather_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/image_drawable_padding"
+            android:paddingEnd="@dimen/image_drawable_padding"
+            tools:text="81%"/>
+
+    <android.support.v7.widget.AppCompatImageView
+            app:srcCompat="@drawable/icon_wind"
+            android:layout_width="@dimen/text_drawable_icon_size"
+            android:layout_height="@dimen/text_drawable_icon_size"/>
+
+    <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/item_hourly_weather_wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/image_drawable_padding"
+            android:paddingEnd="@dimen/image_drawable_padding"
+            tools:text="14Km"/>
+
+</android.support.v7.widget.LinearLayoutCompat>
