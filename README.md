@@ -7,5 +7,10 @@ To build the entire Gradle project, you should run the following in the root of 
 
 
 ## Screenshots
-![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202118.png)
-![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202222.png)
+Cities             |  Weather
+:-------------------------:|:-------------------------:
+![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202118.png)  |  ![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202222.png)
+
+
+
+
