@@ -1,15 +1,15 @@
 package ua.dp.michaellang.weather.presenter;
 
 import android.support.annotation.NonNull;
+import io.reactivex.observers.DisposableObserver;
 import retrofit2.Response;
-import rx.Subscriber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecast;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecastResponse;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
-import ua.dp.michaellang.weather.repository.CityListRepository;
+import ua.dp.michaellang.weather.repository.FavoriteListRepository;
 import ua.dp.michaellang.weather.view.WeatherDetailsView;
 
 import java.util.ArrayList;
@@ -25,12 +25,11 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     private WeatherDetailsView mView;
     private String mCityCode;
 
-    private CityListRepository mCityListRepository;
+    private FavoriteListRepository mFavoriteListRepository;
 
-    private Subscriber<Response<DailyForecastResponse>> mDailyWeatherSubscriber;
-    private Subscriber<Response<List<HourlyForecast>>> mHourlyWeatherSubscriber;
-
-    private Subscriber<City> mCityInfoSubscriber;
+    private DisposableObserver<Response<DailyForecastResponse>> mDailyWeatherSubscriber;
+    private DisposableObserver<Response<List<HourlyForecast>>> mHourlyWeatherSubscriber;
+    private DisposableObserver<City> mCityInfoSubscriber;
 
     private int mCompletedSubscribers = 0;
 
@@ -38,7 +37,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
         mView = view;
         mCityCode = cityCode;
 
-        mCityListRepository = new CityListRepository();
+        mFavoriteListRepository = new FavoriteListRepository();
     }
 
     @Override
@@ -50,11 +49,11 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
         mCityInfoSubscriber = createCityInfoSubscriber();
     }
 
-    private Subscriber<City> createCityInfoSubscriber() {
-        return new Subscriber<City>() {
+    private DisposableObserver<City> createCityInfoSubscriber() {
+        return new DisposableObserver<City>() {
             @Override
-            public void onCompleted() {
-                //stub
+            public void onComplete() {
+
             }
 
             @Override
@@ -70,17 +69,16 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     }
 
     @NonNull
-    private Subscriber<Response<DailyForecastResponse>> createDailyWeatherSubscriber() {
-        return new Subscriber<Response<DailyForecastResponse>>() {
-            @Override
-            public void onCompleted() {
-                mCompletedSubscribers++;
-                checkCompleted();
-            }
-
+    private DisposableObserver<Response<DailyForecastResponse>> createDailyWeatherSubscriber() {
+        return new DisposableObserver<Response<DailyForecastResponse>>() {
             @Override
             public void onError(Throwable e) {
                 mView.onError(R.string.error_connect);
+            }
+
+            @Override
+            public void onComplete() {
+                loadHourlyWeather();
             }
 
             @Override
@@ -101,17 +99,17 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     }
 
     @NonNull
-    private Subscriber<Response<List<HourlyForecast>>> createHourlyWeatherSubscriber() {
-        return new Subscriber<Response<List<HourlyForecast>>>() {
-            @Override
-            public void onCompleted() {
-                mCompletedSubscribers++;
-                checkCompleted();
-            }
+    private DisposableObserver<Response<List<HourlyForecast>>> createHourlyWeatherSubscriber() {
+        return new DisposableObserver<Response<List<HourlyForecast>>>() {
 
             @Override
             public void onError(Throwable e) {
                 mView.onError(R.string.error_connect);
+            }
+
+            @Override
+            public void onComplete() {
+                mView.onLoadComplete();
             }
 
             @Override
@@ -133,29 +131,21 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
         };
     }
 
-    private void checkCompleted() {
-        if (mCompletedSubscribers >= 2) {
-            mView.onLoadComplete();
-            mCompletedSubscribers = 0;
-        }
-    }
-
     @Override
     public void onStop() {
-        if (mDailyWeatherSubscriber != null && mDailyWeatherSubscriber.isUnsubscribed()) {
-            mDailyWeatherSubscriber.unsubscribe();
+        if (mDailyWeatherSubscriber != null && !mDailyWeatherSubscriber.isDisposed()) {
+            mDailyWeatherSubscriber.dispose();
         }
 
-        if (mHourlyWeatherSubscriber != null && mHourlyWeatherSubscriber.isUnsubscribed()) {
-            mHourlyWeatherSubscriber.unsubscribe();
+        if (mHourlyWeatherSubscriber != null && !mHourlyWeatherSubscriber.isDisposed()) {
+            mHourlyWeatherSubscriber.dispose();
         }
 
-        if (mCityInfoSubscriber != null && mCityInfoSubscriber.isUnsubscribed()) {
-            mCityInfoSubscriber.unsubscribe();
+        if (mCityInfoSubscriber != null && !mCityInfoSubscriber.isDisposed()) {
+            mCityInfoSubscriber.dispose();
         }
     }
 
-    @Override
     public void loadHourlyWeather() {
         String language = Locale.getDefault().getLanguage();
         AccuWeatherMethods.getInstance()
@@ -163,7 +153,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     }
 
     @Override
-    public void loadDailyWeather() {
+    public void loadWeather() {
         String language = Locale.getDefault().getLanguage();
         AccuWeatherMethods.getInstance()
                 .getTenDaysForecast(mDailyWeatherSubscriber, mCityCode, language, true);
@@ -172,12 +162,12 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     @Override
     public void addToFavorite() {
         String language = Locale.getDefault().getLanguage();
-        mCityListRepository.addToFavorites(mCityInfoSubscriber, mCityCode, language);
+        mFavoriteListRepository.addToFavorites(mCityInfoSubscriber, mCityCode, language);
     }
 
     @Override
     public void checkIsFavorite() {
-        boolean result = mCityListRepository.getCity(mCityCode) != null;
+        boolean result = mFavoriteListRepository.getCity(mCityCode) != null;
         mView.onIsFavoriteChecked(result);
     }
 
@@ -185,7 +175,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     public void removeFromFavorite() {
         City city = new City();
         city.setKey(mCityCode);
-        mCityListRepository.remove(city);
+        mFavoriteListRepository.remove(city);
         mView.onFavoriteActionSuccess();
 
     }

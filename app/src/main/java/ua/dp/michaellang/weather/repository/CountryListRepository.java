@@ -3,22 +3,23 @@ package ua.dp.michaellang.weather.repository;
 import android.accounts.AuthenticatorException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import retrofit2.Response;
-import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Location.Region;
 import ua.dp.michaellang.weather.repository.model.RealmCountry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Date: 19.09.2017
@@ -43,15 +44,20 @@ public class CountryListRepository {
         getLocalCountryList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Region>>() {
-                    @Override
-                    public void onCompleted() {
-                        observer.onCompleted();
-                    }
-
+                .subscribe(new Observer<List<Region>>() {
                     @Override
                     public void onError(Throwable e) {
                         getNetworkCountryList(language, observer);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        observer.onComplete();
+                    }
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+
                     }
 
                     @Override
@@ -65,15 +71,20 @@ public class CountryListRepository {
         getNetworkCountryList(language)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<List<Region>>>() {
-                    @Override
-                    public void onCompleted() {
-                        observer.onCompleted();
-                    }
-
+                .subscribe(new Observer<Response<List<Region>>>() {
                     @Override
                     public void onError(Throwable e) {
                         observer.onError(e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        observer.onComplete();
+                    }
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+                        //stub
                     }
 
                     @Override
@@ -92,9 +103,9 @@ public class CountryListRepository {
                 .getCountryList(language)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
-                .map(new Func1<Response<List<Region>>, Response<List<Region>>>() {
+                .map(new Function<Response<List<Region>>, Response<List<Region>>>() {
                     @Override
-                    public Response<List<Region>> call(Response<List<Region>> listResponse) {
+                    public Response<List<Region>> apply(@io.reactivex.annotations.NonNull Response<List<Region>> listResponse) throws Exception {
                         addAll(listResponse.body());
                         return listResponse;
                     }
@@ -134,9 +145,9 @@ public class CountryListRepository {
     }
 
     private Observable<List<Region>> getLocalCountryList() {
-        return Observable.defer(new Func0<Observable<List<Region>>>() {
+        return Observable.defer(new Callable<ObservableSource<? extends List<Region>>>() {
             @Override
-            public Observable<List<Region>> call() {
+            public ObservableSource<? extends List<Region>> call() throws Exception {
                 Realm realm = Realm.getDefaultInstance();
 
                 List<Region> regions = new ArrayList<>();

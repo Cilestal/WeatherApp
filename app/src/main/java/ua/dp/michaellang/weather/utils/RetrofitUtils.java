@@ -3,7 +3,7 @@ package ua.dp.michaellang.weather.utils;
 import android.support.annotation.NonNull;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static ua.dp.michaellang.weather.Contants.API_URL;
@@ -34,7 +34,7 @@ public class RetrofitUtils {
         return new Retrofit.Builder()
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(baseUrl)
                 .build();
     }

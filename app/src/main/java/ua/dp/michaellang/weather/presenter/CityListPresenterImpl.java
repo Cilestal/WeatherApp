@@ -2,13 +2,13 @@ package ua.dp.michaellang.weather.presenter;
 
 import android.accounts.AuthenticatorException;
 import android.support.annotation.Nullable;
-import rx.Subscriber;
+import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
-import ua.dp.michaellang.weather.repository.CityListRepository;
+import ua.dp.michaellang.weather.repository.FavoriteListRepository;
 import ua.dp.michaellang.weather.utils.KeyValuePair;
 import ua.dp.michaellang.weather.view.CityListView;
 
@@ -22,8 +22,8 @@ import java.util.Locale;
  * @author Michael Lang
  */
 public class CityListPresenterImpl implements CityListPresenter {
-    private Subscriber<List<City>> mCityListSubscriber;
-    private Subscriber<KeyValuePair<String, HourlyForecast>> mWeatherSubscriber;
+    private DisposableObserver<List<City>> mCityListSubscriber;
+    private DisposableObserver<KeyValuePair<String, HourlyForecast>> mWeatherSubscriber;
 
     private CityListView mView;
 
@@ -42,22 +42,17 @@ public class CityListPresenterImpl implements CityListPresenter {
 
     @Override
     public void onStop() {
-        if (mCityListSubscriber != null && mCityListSubscriber.isUnsubscribed()) {
-            mCityListSubscriber.unsubscribe();
+        if (mCityListSubscriber != null && !mCityListSubscriber.isDisposed()) {
+            mCityListSubscriber.dispose();
         }
 
-        if (mWeatherSubscriber != null && mWeatherSubscriber.isUnsubscribed()) {
-            mWeatherSubscriber.unsubscribe();
+        if (mWeatherSubscriber != null && !mWeatherSubscriber.isDisposed()) {
+            mWeatherSubscriber.dispose();
         }
     }
 
-    private Subscriber<List<City>> createCityListSubscriber() {
-        return new Subscriber<List<City>>() {
-            @Override
-            public void onCompleted() {
-                //stub
-            }
-
+    private DisposableObserver<List<City>> createCityListSubscriber() {
+        return new DisposableObserver<List<City>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -66,6 +61,11 @@ public class CityListPresenterImpl implements CityListPresenter {
                 } else {
                     mView.onError(R.string.error_connect);
                 }
+            }
+
+            @Override
+            public void onComplete() {
+
             }
 
             @Override
@@ -78,16 +78,16 @@ public class CityListPresenterImpl implements CityListPresenter {
         };
     }
 
-    private Subscriber<KeyValuePair<String, HourlyForecast>> createWeatherSubscriber() {
-        return new Subscriber<KeyValuePair<String, HourlyForecast>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
+    private DisposableObserver<KeyValuePair<String, HourlyForecast>> createWeatherSubscriber() {
+        return new DisposableObserver<KeyValuePair<String, HourlyForecast>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e("Load weather error.");
+            }
+
+            @Override
+            public void onComplete() {
+
             }
 
             @Override
@@ -99,8 +99,8 @@ public class CityListPresenterImpl implements CityListPresenter {
 
     @Override
     public void loadCityList() {
-        if (mCityListSubscriber != null && mCityListSubscriber.isUnsubscribed()) {
-            mCityListSubscriber.unsubscribe();
+        if (mCityListSubscriber != null && !mCityListSubscriber.isDisposed()) {
+            mCityListSubscriber.dispose();
         }
 
         mCityListSubscriber = createCityListSubscriber();
@@ -111,15 +111,15 @@ public class CityListPresenterImpl implements CityListPresenter {
             AccuWeatherMethods.getInstance()
                     .getCitiesByCountry(mCityListSubscriber, mCountryId, language, true);
         } else {
-            new CityListRepository()
+            new FavoriteListRepository()
                     .getFavoriteCities(mCityListSubscriber);
         }
     }
 
     @Override
     public void loadCitiesWeather() {
-        if (mWeatherSubscriber != null && mWeatherSubscriber.isUnsubscribed()) {
-            mWeatherSubscriber.unsubscribe();
+        if (mWeatherSubscriber != null && !mWeatherSubscriber.isDisposed()) {
+            mWeatherSubscriber.dispose();
         }
 
         mWeatherSubscriber = createWeatherSubscriber();

@@ -2,12 +2,13 @@ package ua.dp.michaellang.weather.network;
 
 import android.accounts.AuthenticatorException;
 import android.support.annotation.Nullable;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecastResponse;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
@@ -48,14 +49,13 @@ public class AccuWeatherMethods {
             //сохраняем результат в виде ключ-значение
             Observable<KeyValuePair<String, HourlyForecast>> observable
                     = mService.getOneHourForecast(locationKey, API_KEY, language, details)
-                    .map(new Func1<Response<List<HourlyForecast>>, KeyValuePair<String, HourlyForecast>>() {
+                    .map(new Function<Response<List<HourlyForecast>>, KeyValuePair<String, HourlyForecast>>() {
                         @Override
-                        public KeyValuePair<String, HourlyForecast> call(Response<List<HourlyForecast>> listResponse) {
-                            HourlyForecast hourlyForecast = listResponse.body().get(0);
+                        public KeyValuePair<String, HourlyForecast> apply(@NonNull Response<List<HourlyForecast>> response) throws Exception {
+                            HourlyForecast hourlyForecast = response.body().get(0);
                             return new KeyValuePair<>(locationKey, hourlyForecast);
                         }
                     });
-
             lst.add(observable);
         }
 
@@ -71,9 +71,9 @@ public class AccuWeatherMethods {
         mService.getCitiesByCountry(countryId, API_KEY, language, details)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<Response<List<City>>, List<City>>() {
+                .map(new Function<Response<List<City>>, List<City>>() {
                     @Override
-                    public List<City> call(Response<List<City>> listResponse) {
+                    public List<City> apply(@NonNull Response<List<City>> listResponse) throws Exception {
                         if (!listResponse.isSuccessful()) {
                             observer.onError(new AuthenticatorException());
                         }

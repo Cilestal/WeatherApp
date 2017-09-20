@@ -1,7 +1,7 @@
 package ua.dp.michaellang.weather.presenter;
 
 import android.accounts.AuthenticatorException;
-import rx.Subscriber;
+import io.reactivex.observers.DisposableObserver;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.network.model.Location.Region;
 import ua.dp.michaellang.weather.repository.CountryListRepository;
@@ -17,19 +17,14 @@ import java.util.Locale;
  */
 public class CountryPresenterImpl implements CountryListPresenter {
     private CountryListView mView;
-    private Subscriber<List<Region>> mSubscriber;
+    private DisposableObserver<List<Region>> mSubscriber;
 
     public CountryPresenterImpl(CountryListView view) {
         mView = view;
     }
 
-    private Subscriber<List<Region>> createSubscriber() {
-        return new Subscriber<List<Region>>() {
-            @Override
-            public void onCompleted() {
-                // TODO: 14.09.2017
-            }
-
+    private DisposableObserver<List<Region>> createSubscriber() {
+        return new DisposableObserver<List<Region>>() {
             @Override
             public void onError(Throwable e) {
                 if(e instanceof AuthenticatorException) {
@@ -37,6 +32,11 @@ public class CountryPresenterImpl implements CountryListPresenter {
                 } else {
                     mView.onError(R.string.error_connect);
                 }
+            }
+
+            @Override
+            public void onComplete() {
+
             }
 
             @Override
@@ -61,8 +61,8 @@ public class CountryPresenterImpl implements CountryListPresenter {
 
     @Override
     public void onStop() {
-        if (mSubscriber != null && mSubscriber.isUnsubscribed()) {
-            mSubscriber.unsubscribe();
+        if (mSubscriber != null && !mSubscriber.isDisposed()) {
+            mSubscriber.dispose();
         }
     }
 }

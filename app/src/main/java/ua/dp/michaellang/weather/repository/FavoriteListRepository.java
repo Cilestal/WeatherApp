@@ -3,15 +3,19 @@ package ua.dp.michaellang.weather.repository;
 import android.accounts.AuthenticatorException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.MainThreadDisposable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import retrofit2.Response;
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Location.AdministrativeArea;
 import ua.dp.michaellang.weather.network.model.Location.City;
@@ -26,7 +30,7 @@ import java.util.List;
  *
  * @author Michael Lang
  */
-public class CityListRepository {
+public class FavoriteListRepository {
 
     private final Mapper<FavoriteCity, City> mMapper = new Mapper<FavoriteCity, City>() {
         @Override
@@ -52,9 +56,9 @@ public class CityListRepository {
                 .getCityInfo(key, language)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(new Action1<Response<City>>() {
+                .doOnNext(new Consumer<Response<City>>() {
                     @Override
-                    public void call(Response<City> cityResponse) {
+                    public void accept(Response<City> cityResponse) throws Exception {
                         if (cityResponse.isSuccessful()) {
                             City body = cityResponse.body();
                             insertOrUpdate(body);
@@ -64,15 +68,15 @@ public class CityListRepository {
                         }
                     }
                 })
-                .doOnError(new Action1<Throwable>() {
+                .doOnError(new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable e) {
+                    public void accept(Throwable e) throws Exception {
                         cityObservable.onError(e);
                     }
                 })
-                .map(new Func1<Response<City>, City>() {
+                .map(new Function<Response<City>, City>() {
                     @Override
-                    public City call(Response<City> cityResponse) {
+                    public City apply(@io.reactivex.annotations.NonNull Response<City> cityResponse) throws Exception {
                         return cityResponse.body();
                     }
                 })
@@ -94,9 +98,49 @@ public class CityListRepository {
     }
 
     public void getFavoriteCities(Observer<List<City>> observer) {
-        Realm.getDefaultInstance()
-                .where(FavoriteCity.class)
-                .findAll()
+        Observable.create(new ObservableOnSubscribe<List<City>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<City>> e) throws Exception {
+                final Realm realm = Realm.getDefaultInstance();
+                final RealmResults<FavoriteCity> all = realm
+                        .where(FavoriteCity.class)
+                        .findAll();
+
+                final RealmChangeListener<Realm> listener = new RealmChangeListener<Realm>() {
+                    @Override
+                    public void onChange(@NonNull Realm realm) {
+                        e.onNext(getCities(all));
+                    }
+                };
+                realm.addChangeListener(listener);
+
+                e.setDisposable(new MainThreadDisposable() {
+                    @Override
+                    protected void onDispose() {
+                        realm.removeChangeListener(listener);
+                        realm.close();
+                    }
+                });
+
+                e.onNext(getCities(all));
+            }
+        }).subscribe(observer);
+
+
+
+
+   /*     Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<Object> e) throws Exception {
+                RealmResults<FavoriteCity> all = Realm.getDefaultInstance()
+                        .where(FavoriteCity.class)
+                        .findAll();
+            }
+        });
+
+
+
+
                 .asObservable()
                 .flatMap(new Func1<RealmResults<FavoriteCity>, Observable<List<City>>>() {
                     @Override
@@ -108,7 +152,16 @@ public class CityListRepository {
                         return Observable.just(list);
                     }
                 })
-                .subscribe(observer);
+                .subscribe(observer);*/
+    }
+
+    @NonNull
+    private List<City> getCities(RealmResults<FavoriteCity> all) {
+        List<City> list = new ArrayList<>();
+        for (FavoriteCity favoriteCity : all) {
+            list.add(mMapper.map(favoriteCity));
+        }
+        return list;
     }
 
     public City getCity(String key) {

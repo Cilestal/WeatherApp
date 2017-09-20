@@ -17,9 +17,9 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.adapter.CountryListAdapter;
 import ua.dp.michaellang.weather.listener.OnCountrySelectedListener;
@@ -129,20 +129,20 @@ public class CountryListDialog extends DialogFragment
             return false;
         }
 
-        Observable.from(mData)
-                .filter(new Func1<Region, Boolean>() {
+        Observable.fromIterable(mData)
+                .filter(new Predicate<Region>() {
                     @Override
-                    public Boolean call(Region country) {
-                        return country.getLocalizedName()
+                    public boolean test(@io.reactivex.annotations.NonNull Region region) throws Exception {
+                        return region.getLocalizedName()
                                 .toLowerCase()
                                 .contains(query.toLowerCase());
                     }
                 })
                 .toList()
-                .subscribe(new Action1<List<Region>>() {
+                .subscribe(new Consumer<List<Region>>() {
                     @Override
-                    public void call(List<Region> countries) {
-                        mAdapter.setData(countries);
+                    public void accept(List<Region> regions) throws Exception {
+                        mAdapter.setData(regions);
                         mAdapter.notifyDataSetChanged();
                     }
                 });

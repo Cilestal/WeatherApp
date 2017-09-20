@@ -15,9 +15,10 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.adapter.CityListAdapter;
@@ -138,19 +139,19 @@ public class CityListFragment extends Fragment
             return false;
         }
 
-        Observable.from(mData)
-                .filter(new Func1<City, Boolean>() {
+        Observable.fromIterable(mData)
+                .filter(new Predicate<City>() {
                     @Override
-                    public Boolean call(City city) {
+                    public boolean test(@NonNull City city) throws Exception {
                         return city.getLocalizedName()
                                 .toLowerCase()
                                 .contains(query.toLowerCase());
                     }
                 })
                 .toList()
-                .subscribe(new Action1<List<City>>() {
+                .subscribe(new Consumer<List<City>>() {
                     @Override
-                    public void call(List<City> cities) {
+                    public void accept(List<City> cities) throws Exception {
                         mAdapter.setData(cities);
                         mAdapter.notifyDataSetChanged();
                     }

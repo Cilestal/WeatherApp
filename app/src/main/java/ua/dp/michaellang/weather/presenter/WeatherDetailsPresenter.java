@@ -6,8 +6,7 @@ package ua.dp.michaellang.weather.presenter;
  * @author Michael Lang
  */
 public interface WeatherDetailsPresenter extends BasePresenter {
-    void loadHourlyWeather();
-    void loadDailyWeather();
+    void loadWeather();
 
     void addToFavorite();
     void checkIsFavorite();

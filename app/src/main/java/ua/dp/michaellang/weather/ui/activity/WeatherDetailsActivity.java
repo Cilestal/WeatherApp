@@ -115,6 +115,7 @@ public class WeatherDetailsActivity extends BaseActivity
     @Override
     public void onLoadComplete() {
         showProgress(false);
+        showContent(true);
     }
 
     @Override
@@ -168,6 +169,7 @@ public class WeatherDetailsActivity extends BaseActivity
                 })
                 .show();
         showProgress(false);
+        showContent(false);
     }
 
     private void setDayTemperature(DailyForecast data) {
@@ -193,18 +195,23 @@ public class WeatherDetailsActivity extends BaseActivity
 
     private void startLoading() {
         mPresenter.onStart();
-        mPresenter.loadDailyWeather();
-        mPresenter.loadHourlyWeather();
+        mPresenter.loadWeather();
         mPresenter.checkIsFavorite();
     }
 
     private void showProgress(boolean flag) {
         if (flag) {
-            mContentLayout.setVisibility(GONE);
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
-            mContentLayout.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(GONE);
+        }
+    }
+
+    private void showContent(boolean flag) {
+        if (flag) {
+            mContentLayout.setVisibility(View.VISIBLE);
+        } else {
+            mContentLayout.setVisibility(GONE);
         }
     }
 

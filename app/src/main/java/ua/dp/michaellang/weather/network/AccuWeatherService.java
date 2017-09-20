@@ -1,11 +1,11 @@
 package ua.dp.michaellang.weather.network;
 
 import android.support.annotation.Nullable;
+import io.reactivex.Observable;
 import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import rx.Observable;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecastResponse;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
