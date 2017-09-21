@@ -3,6 +3,7 @@ package ua.dp.michaellang.weather.presenter;
 import android.accounts.AuthenticatorException;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
@@ -24,6 +25,8 @@ import java.util.Locale;
 public class CityListPresenterImpl implements CityListPresenter {
     private DisposableObserver<List<City>> mCityListSubscriber;
     private DisposableObserver<Pair<String, HourlyForecast>> mWeatherSubscriber;
+
+    private final CompositeDisposable mDisposables = new CompositeDisposable();
 
     private CityListRepository mRepository;
 
@@ -47,13 +50,7 @@ public class CityListPresenterImpl implements CityListPresenter {
 
     @Override
     public void onStop() {
-        if (mCityListSubscriber != null && !mCityListSubscriber.isDisposed()) {
-            mCityListSubscriber.dispose();
-        }
-
-        if (mWeatherSubscriber != null && !mWeatherSubscriber.isDisposed()) {
-            mWeatherSubscriber.dispose();
-        }
+        mDisposables.clear();
     }
 
     private DisposableObserver<List<City>> createCityListSubscriber() {
@@ -104,11 +101,10 @@ public class CityListPresenterImpl implements CityListPresenter {
 
     @Override
     public void loadCityList() {
-        if (mCityListSubscriber != null && !mCityListSubscriber.isDisposed()) {
-            mCityListSubscriber.dispose();
+        if (mCityListSubscriber == null || mCityListSubscriber.isDisposed()) {
+            mCityListSubscriber = createCityListSubscriber();
+            mDisposables.add(mCityListSubscriber);
         }
-
-        mCityListSubscriber = createCityListSubscriber();
 
         String language = Locale.getDefault().getLanguage();
 
@@ -121,12 +117,10 @@ public class CityListPresenterImpl implements CityListPresenter {
 
     @Override
     public void loadCitiesWeather() {
-        if (mWeatherSubscriber != null && !mWeatherSubscriber.isDisposed()) {
-            mWeatherSubscriber.dispose();
+        if (mWeatherSubscriber == null || mWeatherSubscriber.isDisposed()) {
+            mWeatherSubscriber = createWeatherSubscriber();
+            mDisposables.add(mWeatherSubscriber);
         }
-
-        mWeatherSubscriber = createWeatherSubscriber();
-
 
         String language = Locale.getDefault().getLanguage();
         List<String> keys = new ArrayList<>();

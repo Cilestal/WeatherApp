@@ -2,6 +2,7 @@ package ua.dp.michaellang.weather.presenter;
 
 import android.accounts.AuthenticatorException;
 import android.support.annotation.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecast;
@@ -28,6 +29,8 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     private FavoriteListRepository mFavoriteListRepository;
     private WeatherRepository mWeatherRepository;
 
+    private final CompositeDisposable mDisposables = new CompositeDisposable();
+
     private DisposableObserver<CityWeather> mCityWeatherObserver;
     private DisposableObserver<City> mCityInfoSubscriber;
 
@@ -41,10 +44,11 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
 
     @Override
     public void onStart() {
-        onStop();
-
         mCityWeatherObserver = createCityWeatherObservable();
         mCityInfoSubscriber = createCityInfoObserver();
+
+        mDisposables.add(mCityWeatherObserver);
+        mDisposables.add(mCityInfoSubscriber);
     }
 
     private DisposableObserver<City> createCityInfoObserver() {
@@ -110,13 +114,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
 
     @Override
     public void onStop() {
-        if (mCityWeatherObserver != null && !mCityWeatherObserver.isDisposed()) {
-            mCityWeatherObserver.dispose();
-        }
-
-        if (mCityInfoSubscriber != null && !mCityInfoSubscriber.isDisposed()) {
-            mCityInfoSubscriber.dispose();
-        }
+        mDisposables.clear();
     }
 
     @Override
@@ -143,6 +141,5 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
         city.setKey(mCityCode);
         mFavoriteListRepository.remove(city);
         mView.onFavoriteActionSuccess();
-
     }
 }
