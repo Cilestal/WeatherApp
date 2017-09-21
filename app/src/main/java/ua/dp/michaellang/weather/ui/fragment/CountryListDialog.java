@@ -22,7 +22,6 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.adapter.CountryListAdapter;
-import ua.dp.michaellang.weather.listener.OnCountrySelectedListener;
 import ua.dp.michaellang.weather.network.model.Location.Region;
 import ua.dp.michaellang.weather.presenter.CountryListPresenter;
 import ua.dp.michaellang.weather.presenter.CountryPresenterImpl;
@@ -36,8 +35,7 @@ import java.util.List;
  * @author Michael Lang
  */
 public class CountryListDialog extends DialogFragment
-        implements CountryListView, SearchView.OnQueryTextListener,
-                   OnCountrySelectedListener {
+        implements CountryListView, SearchView.OnQueryTextListener {
 
     public static final String EXTRA_COUNTRY = "ua.dp.michaellang.wether.ui.fragment.EXTRA_COUNTRY";
     public static final String EXTRA_ERROR_MESSAGE = "ua.dp.michaellang.wether.ui.fragment.EXTRA_ERROR_MESSAGE";
@@ -51,10 +49,22 @@ public class CountryListDialog extends DialogFragment
     private List<Region> mData;
     private CountryListPresenter mPresenter;
 
+    private Consumer<Region> mItemSelectedConsumer = new Consumer<Region>() {
+        @Override
+        public void accept(Region country) throws Exception {
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_COUNTRY, country);
+            int resultCode = Activity.RESULT_OK;
+
+            sendResult(intent, resultCode);
+        }
+    };
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new CountryListAdapter(getContext(), this);
+        mAdapter = new CountryListAdapter(getContext(), mItemSelectedConsumer);
         mPresenter = new CountryPresenterImpl(this);
     }
 
@@ -88,7 +98,7 @@ public class CountryListDialog extends DialogFragment
     }
 
     @OnClick(R.id.dialog_country_list_search)
-    void onSeachViewClick(SearchView searchView) {
+    void onSearchViewClick(SearchView searchView) {
         searchView.setIconified(false);
     }
 
@@ -158,15 +168,6 @@ public class CountryListDialog extends DialogFragment
     @Override
     public boolean onQueryTextChange(final String newText) {
         return filterData(newText);
-    }
-
-    @Override
-    public void onCountrySelected(Region country) {
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_COUNTRY, country);
-        int resultCode = Activity.RESULT_OK;
-
-        sendResult(intent, resultCode);
     }
 
     private void sendResult(Intent intent, int resultCode) {
