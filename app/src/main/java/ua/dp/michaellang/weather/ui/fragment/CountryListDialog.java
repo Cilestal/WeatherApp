@@ -49,6 +49,7 @@ public class CountryListDialog extends DialogFragment
     private List<Region> mData;
     private CountryListPresenter mPresenter;
 
+
     private Consumer<Region> mItemSelectedConsumer = new Consumer<Region>() {
         @Override
         public void accept(Region country) throws Exception {
