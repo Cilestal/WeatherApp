@@ -32,7 +32,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     private final CompositeDisposable mDisposables = new CompositeDisposable();
 
     private DisposableObserver<CityWeather> mCityWeatherObserver;
-    private DisposableObserver<City> mCityInfoSubscriber;
+    private DisposableObserver<City> mCityInfoObserver;
 
     public WeatherDetailsPresenterImpl(WeatherDetailsView view, String cityCode) {
         mView = view;
@@ -45,10 +45,10 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     @Override
     public void onStart() {
         mCityWeatherObserver = createCityWeatherObservable();
-        mCityInfoSubscriber = createCityInfoObserver();
+        mCityInfoObserver = createCityInfoObserver();
 
         mDisposables.add(mCityWeatherObserver);
-        mDisposables.add(mCityInfoSubscriber);
+        mDisposables.add(mCityInfoObserver);
     }
 
     private DisposableObserver<City> createCityInfoObserver() {
@@ -126,7 +126,7 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     @Override
     public void addToFavorite() {
         String language = Locale.getDefault().getLanguage();
-        mFavoriteListRepository.addToFavorites(mCityInfoSubscriber, mCityCode, language);
+        mFavoriteListRepository.addToFavorites(mCityInfoObserver, mCityCode, language);
     }
 
     @Override
