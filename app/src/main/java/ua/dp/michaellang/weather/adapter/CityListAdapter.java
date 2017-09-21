@@ -1,6 +1,7 @@
 package ua.dp.michaellang.weather.adapter;
 
 import android.content.Context;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +9,6 @@ import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
 import ua.dp.michaellang.weather.ui.viewholder.CityViewHolder;
-import ua.dp.michaellang.weather.utils.KeyValuePair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +48,9 @@ public class CityListAdapter extends BaseAdapter<City, CityViewHolder> {
         }
     }
 
-    public void updateWeather(KeyValuePair<String, HourlyForecast> data) {
-        String key = data.getKey();
-        mForecastHashMap.put(key, data.getValue());
+    public void updateWeather(Pair<String, HourlyForecast> data) {
+        String key = data.first;
+        mForecastHashMap.put(key, data.second);
 
         for (City city : mData) {
             if (city.getKey().equals(key)) {

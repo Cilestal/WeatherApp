@@ -2,14 +2,14 @@ package ua.dp.michaellang.weather.presenter;
 
 import android.accounts.AuthenticatorException;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
-import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
+import ua.dp.michaellang.weather.repository.CityListRepository;
 import ua.dp.michaellang.weather.repository.FavoriteListRepository;
-import ua.dp.michaellang.weather.utils.KeyValuePair;
 import ua.dp.michaellang.weather.view.CityListView;
 
 import java.util.ArrayList;
@@ -23,16 +23,21 @@ import java.util.Locale;
  */
 public class CityListPresenterImpl implements CityListPresenter {
     private DisposableObserver<List<City>> mCityListSubscriber;
-    private DisposableObserver<KeyValuePair<String, HourlyForecast>> mWeatherSubscriber;
+    private DisposableObserver<Pair<String, HourlyForecast>> mWeatherSubscriber;
+
+    private CityListRepository mRepository;
 
     private CityListView mView;
 
     private String mCountryId;
     private List<City> mCities;
+    private FavoriteListRepository mFavoriteListRepository;
 
     public CityListPresenterImpl(CityListView view, @Nullable String countryId) {
         mView = view;
         mCountryId = countryId;
+        mFavoriteListRepository = new FavoriteListRepository();
+        mRepository = new CityListRepository();
     }
 
     @Override
@@ -78,8 +83,8 @@ public class CityListPresenterImpl implements CityListPresenter {
         };
     }
 
-    private DisposableObserver<KeyValuePair<String, HourlyForecast>> createWeatherSubscriber() {
-        return new DisposableObserver<KeyValuePair<String, HourlyForecast>>() {
+    private DisposableObserver<Pair<String, HourlyForecast>> createWeatherSubscriber() {
+        return new DisposableObserver<Pair<String, HourlyForecast>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e("Load weather error.");
@@ -91,7 +96,7 @@ public class CityListPresenterImpl implements CityListPresenter {
             }
 
             @Override
-            public void onNext(KeyValuePair<String, HourlyForecast> data) {
+            public void onNext(Pair<String, HourlyForecast> data) {
                 mView.onCityWeatherLoaded(data);
             }
         };
@@ -108,11 +113,9 @@ public class CityListPresenterImpl implements CityListPresenter {
         String language = Locale.getDefault().getLanguage();
 
         if (mCountryId != null) {
-            AccuWeatherMethods.getInstance()
-                    .getCitiesByCountry(mCityListSubscriber, mCountryId, language, true);
+            mRepository.getCitiesByCountry(mCityListSubscriber, mCountryId, language, true);
         } else {
-            new FavoriteListRepository()
-                    .getFavoriteCities(mCityListSubscriber);
+            mFavoriteListRepository.getFavoriteCities(mCityListSubscriber);
         }
     }
 
@@ -133,7 +136,6 @@ public class CityListPresenterImpl implements CityListPresenter {
 
         String[] array = keys.toArray(new String[0]);
 
-        AccuWeatherMethods.getInstance()
-                .getCurrentCitiesWeather(mWeatherSubscriber, array, language, false);
+        mRepository.getCurrentCitiesWeather(mWeatherSubscriber, array, language, false);
     }
 }

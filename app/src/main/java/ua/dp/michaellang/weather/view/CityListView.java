@@ -1,9 +1,9 @@
 package ua.dp.michaellang.weather.view;
 
 import android.support.annotation.StringRes;
+import android.support.v4.util.Pair;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
-import ua.dp.michaellang.weather.utils.KeyValuePair;
 
 import java.util.List;
 
@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface CityListView extends BaseView {
     void onCityListLoaded(List<City> data);
-    void onCityWeatherLoaded(KeyValuePair<String, HourlyForecast> data);
+    void onCityWeatherLoaded(Pair<String, HourlyForecast> data);
     void onError(@StringRes int stringResId);
 }

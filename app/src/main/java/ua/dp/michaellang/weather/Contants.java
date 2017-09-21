@@ -13,4 +13,6 @@ public interface Contants {
 
     String WEATHER_ICONS_FILE_FORMAT = "weather_icons/%02d.png";
     String FLAGS_FILE_FORMAT = "flags/%s.png";
+
+    int AUTH_ERROR_CODE = 503;
 }

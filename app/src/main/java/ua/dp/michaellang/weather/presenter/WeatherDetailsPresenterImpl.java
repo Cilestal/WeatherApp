@@ -1,15 +1,15 @@
 package ua.dp.michaellang.weather.presenter;
 
+import android.accounts.AuthenticatorException;
 import android.support.annotation.NonNull;
 import io.reactivex.observers.DisposableObserver;
-import retrofit2.Response;
 import ua.dp.michaellang.weather.R;
-import ua.dp.michaellang.weather.network.AccuWeatherMethods;
 import ua.dp.michaellang.weather.network.model.Forecast.DailyForecast;
-import ua.dp.michaellang.weather.network.model.Forecast.DailyForecastResponse;
 import ua.dp.michaellang.weather.network.model.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.network.model.Location.City;
 import ua.dp.michaellang.weather.repository.FavoriteListRepository;
+import ua.dp.michaellang.weather.repository.WeatherRepository;
+import ua.dp.michaellang.weather.repository.model.CityWeather;
 import ua.dp.michaellang.weather.view.WeatherDetailsView;
 
 import java.util.ArrayList;
@@ -26,17 +26,16 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     private String mCityCode;
 
     private FavoriteListRepository mFavoriteListRepository;
+    private WeatherRepository mWeatherRepository;
 
-    private DisposableObserver<Response<DailyForecastResponse>> mDailyWeatherSubscriber;
-    private DisposableObserver<Response<List<HourlyForecast>>> mHourlyWeatherSubscriber;
+    private DisposableObserver<CityWeather> mCityWeatherObserver;
     private DisposableObserver<City> mCityInfoSubscriber;
-
-    private int mCompletedSubscribers = 0;
 
     public WeatherDetailsPresenterImpl(WeatherDetailsView view, String cityCode) {
         mView = view;
         mCityCode = cityCode;
 
+        mWeatherRepository = new WeatherRepository();
         mFavoriteListRepository = new FavoriteListRepository();
     }
 
@@ -44,12 +43,11 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     public void onStart() {
         onStop();
 
-        mDailyWeatherSubscriber = createDailyWeatherSubscriber();
-        mHourlyWeatherSubscriber = createHourlyWeatherSubscriber();
-        mCityInfoSubscriber = createCityInfoSubscriber();
+        mCityWeatherObserver = createCityWeatherObservable();
+        mCityInfoSubscriber = createCityInfoObserver();
     }
 
-    private DisposableObserver<City> createCityInfoSubscriber() {
+    private DisposableObserver<City> createCityInfoObserver() {
         return new DisposableObserver<City>() {
             @Override
             public void onComplete() {
@@ -69,42 +67,15 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     }
 
     @NonNull
-    private DisposableObserver<Response<DailyForecastResponse>> createDailyWeatherSubscriber() {
-        return new DisposableObserver<Response<DailyForecastResponse>>() {
+    private DisposableObserver<CityWeather> createCityWeatherObservable() {
+        return new DisposableObserver<CityWeather>() {
             @Override
             public void onError(Throwable e) {
-                mView.onError(R.string.error_connect);
-            }
-
-            @Override
-            public void onComplete() {
-                loadHourlyWeather();
-            }
-
-            @Override
-            public void onNext(Response<DailyForecastResponse> response) {
-                if (response.raw().code() == 503) {
+                if (e instanceof AuthenticatorException) {
                     mView.onError(R.string.error_auth);
                 } else {
-                    List<DailyForecast> forecasts = response.body().getDailyForecasts();
-                    ArrayList<DailyForecast> dailyForecasts = new ArrayList<>();
-
-                    for (int i = 0; i < 7; i++) {
-                        dailyForecasts.add(forecasts.get(i));
-                    }
-                    mView.onDailyWeatherLoaded(dailyForecasts);
+                    mView.onError(R.string.error_connect);
                 }
-            }
-        };
-    }
-
-    @NonNull
-    private DisposableObserver<Response<List<HourlyForecast>>> createHourlyWeatherSubscriber() {
-        return new DisposableObserver<Response<List<HourlyForecast>>>() {
-
-            @Override
-            public void onError(Throwable e) {
-                mView.onError(R.string.error_connect);
             }
 
             @Override
@@ -113,32 +84,34 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
             }
 
             @Override
-            public void onNext(Response<List<HourlyForecast>> response) {
-                if (response.raw().code() == 503) {
-                    mView.onError(R.string.error_auth);
-                } else {
-                    List<HourlyForecast> body = response.body();
-                    List<HourlyForecast> hourlyForecasts = new ArrayList<>();
+            public void onNext(CityWeather response) {
+                //Daily forecast -> показываем прогноз на неделю
+                List<DailyForecast> forecasts = response.getDailyForecasts();
+                ArrayList<DailyForecast> dailyForecasts = new ArrayList<>();
 
-                    hourlyForecasts.add(body.get(0));
-                    for (int i = 0; i < 6; i++) {
-                        hourlyForecasts.add(body.get(i * 4 + 3));
-                    }
-
-                    mView.onHourlyWeatherLoaded(hourlyForecasts);
+                for (int i = 0; i < 7; i++) {
+                    dailyForecasts.add(forecasts.get(i));
                 }
+                mView.onDailyWeatherLoaded(dailyForecasts);
+
+                //HourlyForecast -> показываем каждый 4 час
+                List<HourlyForecast> body = response.getHourlyForecasts();
+                List<HourlyForecast> hourlyForecasts = new ArrayList<>();
+
+                hourlyForecasts.add(body.get(0));
+                for (int i = 0; i < 6; i++) {
+                    hourlyForecasts.add(body.get(i * 4 + 3));
+                }
+
+                mView.onHourlyWeatherLoaded(hourlyForecasts);
             }
         };
     }
 
     @Override
     public void onStop() {
-        if (mDailyWeatherSubscriber != null && !mDailyWeatherSubscriber.isDisposed()) {
-            mDailyWeatherSubscriber.dispose();
-        }
-
-        if (mHourlyWeatherSubscriber != null && !mHourlyWeatherSubscriber.isDisposed()) {
-            mHourlyWeatherSubscriber.dispose();
+        if (mCityWeatherObserver != null && !mCityWeatherObserver.isDisposed()) {
+            mCityWeatherObserver.dispose();
         }
 
         if (mCityInfoSubscriber != null && !mCityInfoSubscriber.isDisposed()) {
@@ -146,17 +119,10 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
         }
     }
 
-    public void loadHourlyWeather() {
-        String language = Locale.getDefault().getLanguage();
-        AccuWeatherMethods.getInstance()
-                .get24HoursForecast(mHourlyWeatherSubscriber, mCityCode, language, true);
-    }
-
     @Override
     public void loadWeather() {
         String language = Locale.getDefault().getLanguage();
-        AccuWeatherMethods.getInstance()
-                .getTenDaysForecast(mDailyWeatherSubscriber, mCityCode, language, true);
+        mWeatherRepository.getCityWeather(mCityWeatherObserver, mCityCode, language, true);
     }
 
     @Override
