@@ -32,6 +32,8 @@ public class SearchByCountryFragment extends Fragment {
     private static final int REQUEST_COUNTRY = 0;
     private static final String DIALOG_COUNTRY_LIST = "DIALOG_COUNTRY_LIST";
 
+    private static final String KEY_COUNTRY = "KEY_COUNTRY";
+
     @BindView(R.id.fragment_search_by_country_content) View mContentView;
     @BindView(R.id.fragment_search_by_country_button) Button mButton;
     @BindView(R.id.fragment_search_by_country_image) ImageView mImageView;
@@ -39,12 +41,21 @@ public class SearchByCountryFragment extends Fragment {
     private CountryListDialog mCountryListDialog;
     private Region mCountry;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            mCountry = savedInstanceState.getParcelable(KEY_COUNTRY);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_by_country, container, false);
         ButterKnife.bind(this, view);
+        updateUI();
         return view;
     }
 
@@ -79,13 +90,16 @@ public class SearchByCountryFragment extends Fragment {
 
     private void onDialogItemSelected(Region country) {
         mCountry = country;
-        mButton.setText(mCountry.getLocalizedName());
-        //ImageUtils.loadFlagIcon(getContext(), mImageView, country.getId(), true);
-
-        Drawable drawable = AssetsUtils.getFlag(getContext(), country.getId());
-        mImageView.setImageDrawable(drawable);
-
+        updateUI();
         showFragment();
+    }
+
+    private void updateUI() {
+        if (mCountry != null) {
+            mButton.setText(mCountry.getLocalizedName());
+            Drawable drawable = AssetsUtils.getFlag(getContext(), mCountry.getId());
+            mImageView.setImageDrawable(drawable);
+        }
     }
 
     private void showFragment() {
@@ -103,6 +117,12 @@ public class SearchByCountryFragment extends Fragment {
         // TODO: 15.09.2017
         Timber.e(getString(stringResId));
         Snackbar.make(mContentView, stringResId, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_COUNTRY, mCountry);
     }
 
     public static SearchByCountryFragment newInstance() {
