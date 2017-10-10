@@ -7,9 +7,13 @@ To build the entire Gradle project, you should run the following in the root of 
 
 
 ## Screenshots
-Cities             |  Weather
+List of countries             |  List of cities
 :-------------------------:|:-------------------------:
-![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202118.png)  |  ![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-09-19-202222.png)
+![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-10-10-225811.png)  |  ![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-10-10-225953.png)
+
+Weather             |  Bookmarks
+:-------------------------:|:-------------------------:
+![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-10-10-230142.png)  |  ![alt text](https://raw.githubusercontent.com/Cilestal/WetherApp/master/screenshots/device-2017-10-10-230323.png)
 
 
 
