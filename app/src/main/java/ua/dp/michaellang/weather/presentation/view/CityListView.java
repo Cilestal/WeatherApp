@@ -15,4 +15,6 @@ public interface CityListView extends BaseView {
     void onCityListLoaded(List<City> data);
 
     void onCityWeatherLoaded(Pair<String, HourlyForecast> data);
+
+    void onCityListFiltered(List<City> cities);
 }

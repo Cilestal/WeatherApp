@@ -100,9 +100,7 @@ public class CityListAdapter extends BaseAdapter<City, CityListAdapter.CityViewH
                 mPopulationTextView.setVisibility(View.GONE);
             }
 
-            itemView.setOnClickListener(v -> {
-                WeatherDetailsActivity.start(context, data.getLocalizedName(), data.getKey());
-            });
+            itemView.setOnClickListener(v -> WeatherDetailsActivity.start(context, data.getLocalizedName(), data.getKey()));
         }
 
         public void onHourlyForecastLoaded(Context context, HourlyForecast forecast) {
@@ -110,7 +108,6 @@ public class CityListAdapter extends BaseAdapter<City, CityListAdapter.CityViewH
             //ImageUtils.loadWeatherIcon(context, mImageView, weatherIcon);
             Drawable drawable = mAssetsUtils.getWeatherIcon(context, weatherIcon);
             mImageView.setImageDrawable(drawable);
-
 
             double value = forecast.getTemperature().getValue();
             String temperatureStr = context.getString(R.string.temperature, value);

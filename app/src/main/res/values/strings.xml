@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Accuwether-vrgcourses</string>
+    <string name="app_name">Accuwether app</string>
     <string name="assets_flags_path">file:///android_asset/flags/%s.png</string>
     <string name="assets_weather_icons_path">file:///android_asset/weather_icons/%02d.png</string>
 
@@ -27,6 +27,9 @@
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
     <string name="action_retry">Retry</string>
+
+    <string name="bookmarks">Bookmarks</string>
+    <string name="cities">Cities</string>
 
 
 </resources>

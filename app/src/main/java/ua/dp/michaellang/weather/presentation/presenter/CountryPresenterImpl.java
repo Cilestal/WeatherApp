@@ -1,7 +1,10 @@
 package ua.dp.michaellang.weather.presentation.presenter;
 
 import android.accounts.AuthenticatorException;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Location.Region;
 import ua.dp.michaellang.weather.domain.usecase.CountryListUseCase;
@@ -17,7 +20,6 @@ import java.util.Locale;
  * @author Michael Lang
  */
 public class CountryPresenterImpl implements CountryListPresenter {
-
     private CountryListView mView;
     private CountryListUseCase mInteractor;
 
@@ -45,14 +47,27 @@ public class CountryPresenterImpl implements CountryListPresenter {
 
             @Override
             public void onNext(List<Region> data) {
-                mView.onCountryListLoaded(data);
+                sortData(data);
             }
         };
+    }
+
+    private void sortData(List<Region> data){
+        Observable.fromIterable(data)
+                .sorted((o1, o2) -> o1.getLocalizedName().compareTo(o2.getLocalizedName()))
+                .toList()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(regions -> mView.onCountryListLoaded(regions));
     }
 
     @Override
     public void loadCountryList() {
         String lang = Locale.getDefault().getLanguage();
+
+        if(lang == null || lang.length() == 0){
+            lang = Locale.US.getLanguage();
+        }
         mInteractor.loadCityList(createObserver(), lang);
     }
 

@@ -6,9 +6,11 @@ package ua.dp.michaellang.weather.presentation.ui.adapter;
  * @author Michael Lang
  */
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.presentation.ui.fragment.CityListFragment;
 import ua.dp.michaellang.weather.presentation.ui.fragment.SearchByCountryFragment;
 
@@ -17,9 +19,11 @@ import ua.dp.michaellang.weather.presentation.ui.fragment.SearchByCountryFragmen
  * one of the sections/tabs/pages.
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private Context mContext;
 
-    public SectionsPagerAdapter(FragmentManager fm) {
+    public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
+        mContext = context;
     }
 
     @Override
@@ -43,9 +47,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "CityByCountry";
+                return mContext.getString(R.string.cities);
             case 1:
-                return "Bookmarks";
+                return mContext.getString(R.string.bookmarks);
             default:
                 return null;
         }

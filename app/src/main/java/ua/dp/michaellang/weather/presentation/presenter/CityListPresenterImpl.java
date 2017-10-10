@@ -3,7 +3,9 @@ package ua.dp.michaellang.weather.presentation.presenter;
 import android.accounts.AuthenticatorException;
 import android.support.v4.util.Pair;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
@@ -103,6 +105,24 @@ public class CityListPresenterImpl implements CityListPresenter {
                 .subscribe(keys -> {
                     mCityListInteractor.getCurrentCitiesWeather(
                             createWeatherSubscriber(), keys, language, false);
+                });
+    }
+
+    @Override
+    public void filterData(String query) {
+        if(mCities == null){
+            return;
+        }
+
+        Observable.fromIterable(mCities)
+                .filter(city -> city.getLocalizedName()
+                        .toLowerCase()
+                        .contains(query.toLowerCase()))
+                .toList()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(cities -> {
+                    mView.onCityListFiltered(cities);
                 });
     }
 }

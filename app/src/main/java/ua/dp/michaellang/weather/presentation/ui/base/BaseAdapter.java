@@ -55,7 +55,7 @@ public abstract class BaseAdapter<T, V extends BaseViewHolder<T>>
         mData.clear();
     }
 
-    public void setData(Collection<T> data) {
-        mData = new ArrayList<>(data);
+    public void setData(List<T> data) {
+        mData = data;
     }
 }

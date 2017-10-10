@@ -17,7 +17,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.support.AndroidSupportInjection;
-import io.reactivex.Observable;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
@@ -47,7 +46,6 @@ public class CityListFragment extends BaseFragment
     @BindView(R.id.fragment_city_list_progress_bar) ProgressBar mProgressBar;
 
     private String mCountryId;
-    private List<City> mData;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -106,8 +104,6 @@ public class CityListFragment extends BaseFragment
             return;
         }
         Timber.d("%d cities loaded.", data.size());
-        mData = data;
-
         //загружаем погоду по городам
         mPresenter.loadCitiesWeather();
 
@@ -123,6 +119,12 @@ public class CityListFragment extends BaseFragment
     }
 
     @Override
+    public void onCityListFiltered(List<City> cities) {
+        mAdapter.setData(cities);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onError(@StringRes int stringResId) {
         Snackbar.make(mRecyclerView, stringResId, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, v -> {
@@ -133,24 +135,6 @@ public class CityListFragment extends BaseFragment
         showProgress(false);
     }
 
-    private boolean filterData(final String query) {
-        if (mData == null) {
-            return false;
-        }
-
-        Observable.fromIterable(mData)
-                .filter(city -> city.getLocalizedName()
-                        .toLowerCase()
-                        .contains(query.toLowerCase()))
-                .toList()
-                .subscribe(cities -> {
-                    mAdapter.setData(cities);
-                    mAdapter.notifyDataSetChanged();
-                });
-
-        return true;
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -159,12 +143,14 @@ public class CityListFragment extends BaseFragment
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        return filterData(query);
+        mPresenter.filterData(query);
+        return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        return filterData(newText);
+        mPresenter.filterData(newText);
+        return true;
     }
 
     public static CityListFragment newInstance() {
