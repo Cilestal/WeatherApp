@@ -6,6 +6,6 @@ package ua.dp.michaellang.weather.presentation.presenter;
  * @author Michael Lang
  */
 public interface CityListPresenter extends BasePresenter {
-    void loadCityList();
+    void loadCityList(String countryId);
     void loadCitiesWeather();
 }

@@ -1,4 +1,4 @@
-package ua.dp.michaellang.weather.presentation.inject.module;
+package ua.dp.michaellang.weather.presentation.inject.app;
 
 import dagger.Module;
 import dagger.Provides;
@@ -14,6 +14,8 @@ import ua.dp.michaellang.weather.data.network.incerceptor.AuthInterceptor;
 
 import javax.inject.Singleton;
 
+import static ua.dp.michaellang.weather.data.network.ApiConstants.API_URL;
+
 /**
  * Date: 23.09.2017
  *
@@ -21,11 +23,6 @@ import javax.inject.Singleton;
  */
 @Module
 public class NetModule {
-    private String mBaseUrl;
-
-    public NetModule(String baseUrl) {
-        mBaseUrl = baseUrl;
-    }
 
     @Provides
     @Singleton
@@ -55,7 +52,7 @@ public class NetModule {
                 .client(client)
                 .addConverterFactory(converter)
                 .addCallAdapterFactory(callAdapter)
-                .baseUrl(mBaseUrl)
+                .baseUrl(API_URL)
                 .build();
     }
 

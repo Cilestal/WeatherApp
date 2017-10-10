@@ -7,9 +7,6 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import ua.dp.michaellang.weather.WeatherApplication;
-import ua.dp.michaellang.weather.presentation.inject.component.AppComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.ActivityModule;
 import ua.dp.michaellang.weather.presentation.navigation.Navigator;
 
 import javax.inject.Inject;
@@ -19,13 +16,12 @@ import javax.inject.Inject;
  *
  * @author Michael Lang
  */
-public abstract class BaseActivity<Comp> extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     @Inject Navigator mNavigator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeInjector();
     }
 
     protected void setToolbar(@IdRes int toolbarId, @Nullable String title) {
@@ -48,16 +44,6 @@ public abstract class BaseActivity<Comp> extends AppCompatActivity {
         }
     }
 
-    protected AppComponent getApplicationComponent() {
-        return ((WeatherApplication) getApplication()).getApplicationComponent();
-    }
-
-    protected ActivityModule getActivityModule() {
-        return new ActivityModule(this);
-    }
-
-    public abstract void initializeInjector();
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -67,4 +53,5 @@ public abstract class BaseActivity<Comp> extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

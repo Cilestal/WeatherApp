@@ -1,24 +1,24 @@
 package ua.dp.michaellang.weather;
 
+import android.app.Activity;
 import android.app.Application;
 import com.squareup.leakcanary.LeakCanary;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
 import io.realm.Realm;
 import timber.log.Timber;
-import ua.dp.michaellang.weather.presentation.inject.component.AppComponent;
-import ua.dp.michaellang.weather.presentation.inject.component.DaggerAppComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.AppModule;
-import ua.dp.michaellang.weather.presentation.inject.module.NetModule;
-import ua.dp.michaellang.weather.presentation.inject.module.UtilsModule;
+import ua.dp.michaellang.weather.presentation.inject.app.DaggerAppComponent;
 
-import static ua.dp.michaellang.weather.data.network.ApiConstants.API_URL;
+import javax.inject.Inject;
 
 /**
  * Date: 14.09.2017
  *
  * @author Michael Lang
  */
-public class WeatherApplication extends Application {
-    private AppComponent mAppComponent;
+public class WeatherApplication extends Application implements HasActivityInjector {
+
+    @Inject DispatchingAndroidInjector<Activity> mActivityDispatchingAndroidInjector;
 
     @Override
     public void onCreate() {
@@ -37,15 +37,10 @@ public class WeatherApplication extends Application {
     }
 
     private void initializeInjector() {
-        this.mAppComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .netModule(new NetModule(API_URL))
-                .utilsModule(new UtilsModule())
-                .build();
-    }
-
-    public AppComponent getApplicationComponent() {
-        return mAppComponent;
+        DaggerAppComponent.builder()
+                .application(this)
+                .build()
+                .inject(this);
     }
 
     private void initializeLeakDetection() {
@@ -55,5 +50,10 @@ public class WeatherApplication extends Application {
             }
             LeakCanary.install(this);
         }
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Activity> activityInjector() {
+        return mActivityDispatchingAndroidInjector;
     }
 }

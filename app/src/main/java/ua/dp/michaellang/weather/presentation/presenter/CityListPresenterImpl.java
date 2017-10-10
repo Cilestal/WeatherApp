@@ -8,12 +8,10 @@ import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.data.entity.Location.City;
-import ua.dp.michaellang.weather.presentation.inject.ActivityScope;
 import ua.dp.michaellang.weather.domain.usecase.CityListUseCase;
 import ua.dp.michaellang.weather.presentation.view.CityListView;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.Locale;
 
@@ -22,20 +20,16 @@ import java.util.Locale;
  *
  * @author Michael Lang
  */
-@ActivityScope
 public class CityListPresenterImpl implements CityListPresenter {
     private CityListView mView;
     private CityListUseCase mCityListInteractor;
-    private String mCountryId;
 
     private List<City> mCities;
 
     @Inject
-    public CityListPresenterImpl(CityListView view, CityListUseCase cityListInteractor,
-            @Named("country_id") String countryId) {
+    public CityListPresenterImpl(CityListView view, CityListUseCase cityListInteractor) {
         mView = view;
         mCityListInteractor = cityListInteractor;
-        mCountryId = countryId;
     }
 
     @Override
@@ -95,9 +89,9 @@ public class CityListPresenterImpl implements CityListPresenter {
     }
 
     @Override
-    public void loadCityList() {
+    public void loadCityList(String countryId) {
         String language = Locale.getDefault().getLanguage();
-        mCityListInteractor.getCityList(createCityListSubscriber(), mCountryId, language, true);
+        mCityListInteractor.getCityList(createCityListSubscriber(), countryId, language, true);
     }
 
     @Override

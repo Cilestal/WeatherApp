@@ -3,9 +3,6 @@ package ua.dp.michaellang.weather.presentation.ui.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import ua.dp.michaellang.weather.WeatherApplication;
-import ua.dp.michaellang.weather.presentation.inject.component.AppComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.FragmentModule;
 
 /**
  * Date: 25.09.2017
@@ -16,10 +13,10 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        inject();
+        //inject();
     }
 
-    protected AppComponent getApplicationComponent() {
+/*    protected AppComponent getApplicationComponent() {
         return ((WeatherApplication) getActivity().getApplication()).getApplicationComponent();
     }
 
@@ -27,5 +24,5 @@ public abstract class BaseDialogFragment extends DialogFragment {
         return new FragmentModule(this);
     }
 
-    protected abstract void inject() throws IllegalStateException;
+    protected abstract void inject() throws IllegalStateException;*/
 }

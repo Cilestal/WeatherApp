@@ -1,5 +1,6 @@
 package ua.dp.michaellang.weather.presentation.ui.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,10 +16,10 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Location.Region;
-import ua.dp.michaellang.weather.presentation.inject.component.DaggerFragmentComponents;
 import ua.dp.michaellang.weather.presentation.ui.base.BaseFragment;
 import ua.dp.michaellang.weather.presentation.utils.AssetsUtils;
 
@@ -60,11 +61,9 @@ public class SearchByCountryFragment extends BaseFragment {
     }
 
     @Override
-    protected void inject() throws IllegalStateException {
-        DaggerFragmentComponents.builder()
-                .appComponent(getApplicationComponent())
-                .build()
-                .inject(this);
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @Nullable

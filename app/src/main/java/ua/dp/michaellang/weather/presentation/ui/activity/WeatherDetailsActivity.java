@@ -17,13 +17,10 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.android.AndroidInjection;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Forecast.DailyForecast;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
-import ua.dp.michaellang.weather.presentation.inject.HasComponent;
-import ua.dp.michaellang.weather.presentation.inject.component.DaggerWeatherDetailsComponent;
-import ua.dp.michaellang.weather.presentation.inject.component.WeatherDetailsComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.WeatherDetailsModule;
 import ua.dp.michaellang.weather.presentation.presenter.WeatherDetailsPresenter;
 import ua.dp.michaellang.weather.presentation.ui.adapter.DailyWeatherAdapter;
 import ua.dp.michaellang.weather.presentation.ui.adapter.HourlyWeatherAdapter;
@@ -42,9 +39,7 @@ import static android.view.View.GONE;
  *
  * @author Michael Lang
  */
-public class WeatherDetailsActivity extends BaseActivity
-        implements WeatherDetailsView,
-                   HasComponent<WeatherDetailsComponent> {
+public class WeatherDetailsActivity extends BaseActivity implements WeatherDetailsView {
     public static final String EXTRA_CITY_NAME = "ua.dp.michaellang.weather.ui.activity.EXTRA_CITY_NAME";
     public static final String EXTRA_CITY_KEY = "ua.dp.michaellang.weather.ui.activity.EXTRA_CITY_KEY";
 
@@ -66,16 +61,17 @@ public class WeatherDetailsActivity extends BaseActivity
     @Inject AssetsUtils mAssetsUtils;
 
     private Boolean mIsFavorite;
-    private WeatherDetailsComponent mComponent;
+    private String mCityCode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather_details);
         ButterKnife.bind(this);
 
         String cityName = getIntent().getStringExtra(EXTRA_CITY_NAME);
-
+        mCityCode = getIntent().getStringExtra(EXTRA_CITY_KEY);
 
         setToolbar(R.id.toolbar, cityName);
 
@@ -83,19 +79,6 @@ public class WeatherDetailsActivity extends BaseActivity
         showBackButton();
 
         startLoading();
-    }
-
-    @Override
-    public void initializeInjector() {
-        String cityKey = getIntent().getStringExtra(EXTRA_CITY_KEY);
-
-        mComponent = DaggerWeatherDetailsComponent.builder()
-                .appComponent(getApplicationComponent())
-                .activityModule(getActivityModule())
-                .weatherDetailsModule(new WeatherDetailsModule(this, cityKey))
-                .build();
-
-        mComponent.inject(this);
     }
 
     private void initRecyclerViews() {
@@ -171,9 +154,9 @@ public class WeatherDetailsActivity extends BaseActivity
     void setFloatingActionButtonClick() {
         if (mIsFavorite != null) {
             if (mIsFavorite) {
-                mPresenter.removeFromFavorite();
+                mPresenter.removeFromFavorite(mCityCode);
             } else {
-                mPresenter.addToFavorite();
+                mPresenter.addToFavorite(mCityCode);
             }
         }
     }
@@ -210,8 +193,8 @@ public class WeatherDetailsActivity extends BaseActivity
 
     private void startLoading() {
         mPresenter.onStart();
-        mPresenter.loadWeather();
-        mPresenter.checkIsFavorite();
+        mPresenter.loadWeather(mCityCode);
+        mPresenter.checkIsFavorite(mCityCode);
     }
 
     private void showProgress(boolean flag) {
@@ -246,10 +229,5 @@ public class WeatherDetailsActivity extends BaseActivity
     public static void start(Context context, String cityName, String cityKey) {
         Intent starter = newIntent(context, cityName, cityKey);
         context.startActivity(starter);
-    }
-
-    @Override
-    public WeatherDetailsComponent getComponent() {
-        return mComponent;
     }
 }

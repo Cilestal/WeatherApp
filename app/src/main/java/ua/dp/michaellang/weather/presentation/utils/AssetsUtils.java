@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import timber.log.Timber;
 
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,7 @@ import static ua.dp.michaellang.weather.Contants.WEATHER_ICONS_FILE_FORMAT;
  *
  * @author Michael Lang
  */
+@Singleton
 public class AssetsUtils {
     private static Map<Integer, Drawable> mWeatherIcons;
     private static Map<String, Drawable> mFlagIcons;

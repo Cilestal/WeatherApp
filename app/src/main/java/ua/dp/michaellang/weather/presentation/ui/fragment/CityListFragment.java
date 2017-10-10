@@ -1,5 +1,6 @@
 package ua.dp.michaellang.weather.presentation.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -15,13 +16,12 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.android.support.AndroidSupportInjection;
 import io.reactivex.Observable;
 import timber.log.Timber;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
 import ua.dp.michaellang.weather.data.entity.Location.City;
-import ua.dp.michaellang.weather.presentation.inject.component.DaggerCityListComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.CityListModule;
 import ua.dp.michaellang.weather.presentation.presenter.CityListPresenter;
 import ua.dp.michaellang.weather.presentation.ui.adapter.CityListAdapter;
 import ua.dp.michaellang.weather.presentation.ui.base.BaseFragment;
@@ -57,13 +57,9 @@ public class CityListFragment extends BaseFragment
     }
 
     @Override
-    protected void inject() throws IllegalStateException {
-        DaggerCityListComponent.builder()
-                .appComponent(getApplicationComponent())
-                .fragmentModule(getFragmentModule())
-                .cityListModule(new CityListModule(this, mCountryId))
-                .build()
-                .inject(this);
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @Override
@@ -88,7 +84,7 @@ public class CityListFragment extends BaseFragment
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         mSearchView.setOnQueryTextListener(this);
-        mPresenter.loadCityList();
+        mPresenter.loadCityList(mCountryId);
     }
 
     @OnClick(R.id.fragment_city_list_search_view)
@@ -131,7 +127,7 @@ public class CityListFragment extends BaseFragment
         Snackbar.make(mRecyclerView, stringResId, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_retry, v -> {
                     mPresenter.onStart();
-                    mPresenter.loadCityList();
+                    mPresenter.loadCityList(mCountryId);
                 })
                 .show();
         showProgress(false);

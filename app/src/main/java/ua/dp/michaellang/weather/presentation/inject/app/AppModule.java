@@ -1,4 +1,4 @@
-package ua.dp.michaellang.weather.presentation.inject.module;
+package ua.dp.michaellang.weather.presentation.inject.app;
 
 import android.app.Application;
 import android.content.Context;
@@ -11,29 +11,31 @@ import ua.dp.michaellang.weather.data.repository.WeatherRepository;
 import ua.dp.michaellang.weather.data.repository.WeatherRepositoryImpl;
 import ua.dp.michaellang.weather.data.repository.entity.mapper.CountryMapper;
 import ua.dp.michaellang.weather.data.repository.entity.mapper.FavoriteCityMapper;
+import ua.dp.michaellang.weather.presentation.inject.activity.MainActivitySubcomponent;
+import ua.dp.michaellang.weather.presentation.inject.activity.WeatherDetailsActivitySubcomponent;
+import ua.dp.michaellang.weather.presentation.navigation.Navigator;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import static ua.dp.michaellang.weather.Contants.APP_CONTEXT;
 
 /**
  * Date: 23.09.2017
  *
  * @author Michael Lang
  */
-@Module
+@Module(subcomponents = {
+        MainActivitySubcomponent.class,
+        WeatherDetailsActivitySubcomponent.class
+})
 public class AppModule {
-
-    private final Application mApplication;
-
-    public AppModule(Application application) {
-        mApplication = application;
-    }
 
     @Provides
     @Singleton
-    @Named("APP_CONTEXT")
-    Context provideApplicationContext() {
-        return this.mApplication;
+    @Named(APP_CONTEXT)
+    Context provideApplicationContext(Application application) {
+        return application;
     }
 
     @Provides
@@ -60,5 +62,10 @@ public class AppModule {
         return new WeatherRepositoryImpl(service);
     }
 
+    @Provides
+    @Singleton
+    Navigator provideNavigator() {
+        return new Navigator();
+    }
 
 }

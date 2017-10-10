@@ -9,12 +9,10 @@ import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.CityWeather;
 import ua.dp.michaellang.weather.data.entity.Forecast.DailyForecast;
 import ua.dp.michaellang.weather.data.entity.Forecast.HourlyForecast;
-import ua.dp.michaellang.weather.presentation.inject.ActivityScope;
 import ua.dp.michaellang.weather.domain.usecase.WeatherDetailsUseCase;
 import ua.dp.michaellang.weather.presentation.view.WeatherDetailsView;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -24,19 +22,15 @@ import java.util.Locale;
  *
  * @author Michael Lang
  */
-@ActivityScope
 public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
 
     private WeatherDetailsUseCase mInteractor;
     private WeatherDetailsView mView;
-    private String mCityCode;
 
     @Inject
-    public WeatherDetailsPresenterImpl(WeatherDetailsUseCase interactor,
-            WeatherDetailsView view, @Named("city_code") String cityCode) {
+    public WeatherDetailsPresenterImpl(WeatherDetailsUseCase interactor, WeatherDetailsView view) {
         mInteractor = interactor;
         mView = view;
-        mCityCode = cityCode;
     }
 
     @Override
@@ -134,24 +128,24 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     }
 
     @Override
-    public void loadWeather() {
+    public void loadWeather(String cityCode) {
         String language = Locale.getDefault().getLanguage();
-        mInteractor.getCityWeather(createCityWeatherObservable(), mCityCode, language, true);
+        mInteractor.getCityWeather(createCityWeatherObservable(), cityCode, language, true);
     }
 
     @Override
-    public void addToFavorite() {
+    public void addToFavorite(String cityCode) {
         String language = Locale.getDefault().getLanguage();
-        mInteractor.addToFavorites(createAddToFavoriteObserver(), mCityCode, language);
+        mInteractor.addToFavorites(createAddToFavoriteObserver(), cityCode, language);
     }
 
     @Override
-    public void checkIsFavorite() {
-        mInteractor.checkFavorite(createFavoriteCheckObserver(), mCityCode);
+    public void checkIsFavorite(String cityCode) {
+        mInteractor.checkFavorite(createFavoriteCheckObserver(), cityCode);
     }
 
     @Override
-    public void removeFromFavorite() {
-        mInteractor.remove(createRemoveFromFavoriteObserver(), mCityCode);
+    public void removeFromFavorite(String cityCode) {
+        mInteractor.remove(createRemoveFromFavoriteObserver(), cityCode);
     }
 }

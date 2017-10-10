@@ -6,11 +6,11 @@ package ua.dp.michaellang.weather.presentation.presenter;
  * @author Michael Lang
  */
 public interface WeatherDetailsPresenter extends BasePresenter {
-    void loadWeather();
+    void loadWeather(String cityCode);
 
-    void addToFavorite();
+    void addToFavorite(String cityCode);
 
-    void checkIsFavorite();
+    void checkIsFavorite(String cityCode);
 
-    void removeFromFavorite();
+    void removeFromFavorite(String cityCode);
 }

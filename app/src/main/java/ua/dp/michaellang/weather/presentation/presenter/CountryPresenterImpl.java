@@ -4,7 +4,6 @@ import android.accounts.AuthenticatorException;
 import io.reactivex.observers.DisposableObserver;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Location.Region;
-import ua.dp.michaellang.weather.presentation.inject.ActivityScope;
 import ua.dp.michaellang.weather.domain.usecase.CountryListUseCase;
 import ua.dp.michaellang.weather.presentation.view.CountryListView;
 
@@ -17,7 +16,6 @@ import java.util.Locale;
  *
  * @author Michael Lang
  */
-@ActivityScope
 public class CountryPresenterImpl implements CountryListPresenter {
 
     private CountryListView mView;

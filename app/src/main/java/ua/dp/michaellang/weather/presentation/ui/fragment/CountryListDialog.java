@@ -2,6 +2,7 @@ package ua.dp.michaellang.weather.presentation.ui.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,12 +16,11 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.android.support.AndroidSupportInjection;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import ua.dp.michaellang.weather.R;
 import ua.dp.michaellang.weather.data.entity.Location.Region;
-import ua.dp.michaellang.weather.presentation.inject.component.DaggerCountryListComponent;
-import ua.dp.michaellang.weather.presentation.inject.module.CountryListModule;
 import ua.dp.michaellang.weather.presentation.presenter.CountryListPresenter;
 import ua.dp.michaellang.weather.presentation.ui.adapter.CountryListAdapter;
 import ua.dp.michaellang.weather.presentation.ui.base.BaseDialogFragment;
@@ -64,16 +64,6 @@ public class CountryListDialog extends BaseDialogFragment
     }
 
     @Override
-    protected void inject() throws IllegalStateException {
-        DaggerCountryListComponent.builder()
-                .appComponent(getApplicationComponent())
-                .fragmentModule(getFragmentModule())
-                .countryListModule(new CountryListModule(this))
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         mPresenter.onStart();
@@ -84,6 +74,12 @@ public class CountryListDialog extends BaseDialogFragment
     public void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @NonNull
