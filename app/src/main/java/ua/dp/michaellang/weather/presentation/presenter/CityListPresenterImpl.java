@@ -93,24 +93,31 @@ public class CityListPresenterImpl implements CityListPresenter {
     @Override
     public void loadCityList(String countryId) {
         String language = Locale.getDefault().getLanguage();
+
+        if (language == null || language.length() == 0) {
+            language = Locale.US.getLanguage();
+        }
         mCityListInteractor.getCityList(createCityListSubscriber(), countryId, language, true);
     }
 
     @Override
     public void loadCitiesWeather() {
         String language = Locale.getDefault().getLanguage();
+        if (language == null || language.length() == 0) {
+            language = Locale.US.getLanguage();
+        }
+
+        String finalLanguage = language;
         Observable.fromIterable(mCities)
                 .map(City::getKey)
                 .toList()
-                .subscribe(keys -> {
-                    mCityListInteractor.getCurrentCitiesWeather(
-                            createWeatherSubscriber(), keys, language, false);
-                });
+                .subscribe(keys -> mCityListInteractor.getCurrentCitiesWeather(
+                        createWeatherSubscriber(), keys, finalLanguage, false));
     }
 
     @Override
     public void filterData(String query) {
-        if(mCities == null){
+        if (mCities == null) {
             return;
         }
 

@@ -130,12 +130,18 @@ public class WeatherDetailsPresenterImpl implements WeatherDetailsPresenter {
     @Override
     public void loadWeather(String cityCode) {
         String language = Locale.getDefault().getLanguage();
+        if(language == null || language.length() == 0){
+            language = Locale.US.getLanguage();
+        }
         mInteractor.getCityWeather(createCityWeatherObservable(), cityCode, language, true);
     }
 
     @Override
     public void addToFavorite(String cityCode) {
         String language = Locale.getDefault().getLanguage();
+        if(language == null || language.length() == 0){
+            language = Locale.US.getLanguage();
+        }
         mInteractor.addToFavorites(createAddToFavoriteObserver(), cityCode, language);
     }
 
