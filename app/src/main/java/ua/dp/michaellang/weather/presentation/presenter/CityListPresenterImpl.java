@@ -128,8 +128,6 @@ public class CityListPresenterImpl implements CityListPresenter {
                 .toList()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(cities -> {
-                    mView.onCityListFiltered(cities);
-                });
+                .subscribe(cities -> mView.onCityListFiltered(cities));
     }
 }

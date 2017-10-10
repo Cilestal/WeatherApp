@@ -38,7 +38,8 @@ public class CountryListInteractor extends BaseInteractor
         Disposable disp = mRepository.getLocalCountryList()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer::onNext, throwable -> loadNetworkCityList(observer, language));
+                .subscribe(observer::onNext,
+                        throwable -> loadNetworkCityList(observer, language));
 
         addDisposable(observer);
         addDisposable(disp);
@@ -57,7 +58,7 @@ public class CountryListInteractor extends BaseInteractor
                     } else {
                         observer.onError(new Exception(listResponse.errorBody().string()));
                     }
-                });
+                }, observer::onError);
         addDisposable(disposable);
     }
 }
