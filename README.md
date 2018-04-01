@@ -1,4 +1,4 @@
-# WetherApp
+# WeatherApp
 
 ## Build project
 To build the entire Gradle project, you should run the following in the root of the checkout.<br>
